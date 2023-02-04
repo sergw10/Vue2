@@ -1,4 +1,4 @@
-# civenty
+# Vue 2
 
 ## Project setup
 ```
