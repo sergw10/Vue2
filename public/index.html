@@ -8,8 +8,9 @@
     <meta name="description" content="test, work preview, vue test todo">
 
     <!-- Font -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600&amp;subset=cyrillic,cyrillic-ext,vietnamese"
-        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
 
     <!-- Favicon -->
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
@@ -20,8 +21,14 @@
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
+
+    <div class="main-wrapper">
+        <header class="header"></header>
+
+        <div id="app"></div>
+        <!-- built files will be auto injected -->
+    </div>
+
+    <footer class="footer"></footer>
   </body>
 </html>

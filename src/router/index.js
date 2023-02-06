@@ -11,17 +11,20 @@ const routes = [
   {
     path: '',
     name: 'LoginPage',
-    component: LoginPage
+    component: LoginPage,
+    props: true
   },
   {
     path: '/users',
     name: 'UsersListPage',
-    component: UsersList
+    component: UsersList,
+    props: true
   },
   {
     path: '/users/:id',
     name: 'SingleUserPage',
-    component: SingleUser
+    component: SingleUser,
+    props: true
   }
 ]
 

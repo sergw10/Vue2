@@ -5,6 +5,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'app'
 }
@@ -12,7 +13,7 @@ export default {
 
 <style lang="scss">
   // Variables
-  $dark-text: #363b43;
+  $body-background-color: #828282;
   $border-color: #dadce0;
   $green: #42b983;
 
@@ -30,6 +31,20 @@ export default {
     font-size: 100%;
     font: inherit;
     vertical-align: baseline;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    font-family: 'Roboto', sans-serif;
+    -webkit-text-size-adjust: none;
+    font-size: 16px;
+    line-height: 1.154;
+    letter-spacing: .25px;
+    font-weight: 400;
+    background-color: $body-background-color;
   }
 
   article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
@@ -60,29 +75,19 @@ export default {
     display: inline-block;
     text-align: center;
     padding: 8px 24px;
-    border-radius: 4px;
-    border: 1px solid $border-color;
-    background-color: transparent;
+    border: 0;
     outline: 0;
-    font-weight: 600;
-    letter-spacing: .25px;
     transition: .3s;
-    color: $green;
     cursor: pointer;
-    &:hover {
-      background-color: #f7f8f8;
-    }
-    &:active {
-      background-color: rgba(95,99,104,0.1);
-      box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 2px 6px 2px rgba(60,64,67,.15);
-    }
 
     &.btn-green {
       color: white;
       background-color: $green;
+
       &:hover {
         background-color: #4ccd92;
       }
+
       &:active {
         background-color: #3ca172;
         box-shadow: 0 1px 2px 0 rgba(66,185,131,.3), 0 2px 6px 2px rgba(66,185,131,0.15);
@@ -99,50 +104,29 @@ export default {
   }
 
   input:-webkit-autofill {
-    -webkit-text-fill-color: $dark-text !important;
+    -webkit-text-fill-color: #363b43 !important;
 
     &, &:hover, &:focus, &:active {
       -webkit-box-shadow: 0 0 0 20px white inset !important;
     }
   }
 
-  body {
-    font-family: 'Open Sans', sans-serif;
-    -webkit-text-size-adjust: none;
-    font-size: 13px;
-    line-height: 1.154;
-    letter-spacing: .25px;
-    font-weight: 400;
-    color: $dark-text;
-  }
-
-  .wrapper {
-    display: block;
-    width: 96%;
-    border-radius: 8px;
-    border: 1px solid $border-color;
-    margin: 0 auto;
-    padding: 36px;
+  /* Classes */
+  .main-wrapper {
+    min-height: 100%;
+    padding-bottom: 270px;
   }
 
   .header {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px 36px;
-    margin: 20px auto;
+    width: 100%;
+    height: 60px;
+    background-color: #474747;
   }
 
-  .breadcrumbs__wrapper {
-    font-weight: 600;
-    padding-top: 10px;
-  }
-
-  .delimeter {
-    display: inline-block;
-    position: relative;
-    top: .5px;
-    margin: 0 8px;
-    font-weight: 600;
-    color: $green;
+  .footer {
+    width: 100%;
+    margin-top: -270px;
+    height: 270px;
+    background-color: #474747;
   }
 </style>

@@ -2,145 +2,218 @@
   <div>
 
     <div class="login-page__wrapper">
+
       <div class="login-page__title">
         <img src="@/assets/logo.png" alt="Vue logo">
-        <h1>{{ form.title }}</h1>
+        <h1>{{ loginPage.form.title }}</h1>
       </div>
+
       <form id="form" class="login-page__form" @submit.prevent>
-        <label for="login">{{ form.mailLabelText }}</label>
-        <input
-          id="login"
-          type="text"
-          v-model="form.userEmailValue">
-        <label for="password">{{ form.passLabelText }}</label>
-        <input
-          id="password"
-          type="password"
-          v-model="form.userPasswordValue">
+        <p>{{ loginPage.form.description }}</p>
+        <input id="username"
+               type="text"
+               :placeholder="loginPage.form.usernamePlaceholder"
+               v-model="loginPage.usernameValue">
+        <input id="phoneNumber"
+               type="text"
+               :placeholder="loginPage.form.phoneNumberPlaceholder"
+               v-model="loginPage.userPhoneNumberValue">
         <div class="login-page__button-wrap">
-          <router-link :to="'/users'">
-              <button @click="validateForm()" type="button">{{ form.btnText }}</button>
-          </router-link>
+          <button @click="logIn()" type="button">{{ loginPage.form.btnText }}</button>
         </div>
       </form>
     </div>
 
     <div class="login-page__wrapper login-page__wrapper-clue">
-      <p>If you don't remember, just copy!</p>
+      <p>If you don't remember...</p>
       <br>
-      <span>Your Email: </span>
-      <b>{{ form.emailClue }}</b>
-      <span>Your Password: </span>
-      <b>{{ form.passwordClue }}</b>
+      <div>
+        <span>Test username: </span>
+        <b>{{ loginPage.usernameExample }}</b>
+      </div>
+      <div>
+        <span>Test phone number: </span>
+        <b>{{ loginPage.phoneNumberExample }}</b>
+      </div>
+      <br>
+      <div>
+        <span>JsonPlaceholder:</span>
+        <b><a target="_blank" href="https://jsonplaceholder.typicode.com/users">Users</a></b>
+      </div>
     </div>
 
   </div>
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
   name: 'LoginPage',
 
   data () {
     return {
-      form: {
-        userEmailValue: '',
-        userPasswordValue: '',
+      loginPage: {
+        /* Data */
+        currentUser: {},
+        usernameValue: '',
+        userPhoneNumberValue: '',
 
-        title: 'Login Page',
-        mailLabelText: 'Mail:',
-        passLabelText: 'Password:',
-        btnText: 'Sign in',
-        emailClue: 'admin@example.com',
-        passwordClue: 'password'
+        /* Example text */
+        usernameExample: 'Bret',
+        phoneNumberExample: '1-770-736-8031 x56442',
+
+        /* Form */
+        form: {
+
+          /* Text */
+          title: 'Login page',
+          description: 'Description',
+
+          /* Inputs */
+          usernamePlaceholder: 'Your Username',
+          phoneNumberPlaceholder: 'Your Phone',
+
+          /* Button */
+          btnText: 'Login'
+        }
       }
     }
   },
 
+  created () {
+    this.getUsers()
+  },
+
+  computed: {
+    ...mapGetters([
+      'ALL_USERS'
+    ])
+  },
+
   methods: {
-    setDataToLocalStorage () {
-      localStorage.setItem('email', this.form.userEmailValue)
-      localStorage.setItem('password', this.form.userPasswordValue)
+    ...mapActions([
+      'getUsers'
+    ]),
+
+    setCurrentUserToState () {
+      this.$store.commit('setCurrentUser', this.loginPage.currentUser)
     },
 
-    checkSignIn () {
-      return localStorage.getItem('signIn') === 'true'
+    defineCurrentUser () {
+      const usernameValue = this.loginPage.usernameValue
+      const userPhoneNumberValue = this.loginPage.userPhoneNumberValue
+      let currentUser = {}
+
+      this.ALL_USERS.forEach(function (item) {
+        if (item.username === usernameValue && item.phone === userPhoneNumberValue) {
+          currentUser = item
+        }
+      })
+
+      this.loginPage.currentUser = currentUser
     },
 
-    validateEmail () {
-      return this.form.userEmailValue === this.form.emailClue
+    validateUserName () {
+      const usernameValue = this.loginPage.usernameValue
+      return this.ALL_USERS.some(function (users) {
+        return users.username === usernameValue
+      })
     },
 
-    validatePassword () {
-      return this.form.userPasswordValue === this.form.passwordClue
+    validatePhoneNumber () {
+      const userPhoneNumberValue = this.loginPage.userPhoneNumberValue
+      return this.ALL_USERS.some(function (users) {
+        return users.phone === userPhoneNumberValue
+      })
     },
 
     validateForm () {
-      this.setDataToLocalStorage()
+      return this.validateUserName() && this.validatePhoneNumber()
+    },
 
-      this.validateEmail() && this.validatePassword()
-        ? localStorage.setItem('signIn', true)
-        : localStorage.setItem('signIn', false)
+    logIn () {
+      if (this.validateForm()) {
+        this.defineCurrentUser()
+        this.setCurrentUserToState()
 
-      if (!this.checkSignIn()) event.preventDefault()
+        localStorage.setItem('signIn', true)
+      } else {
+        localStorage.setItem('signIn', false)
+      }
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-  // Variables
-  $green: #42b983;
+  /* Variables */
+  $main-green: #42b983;
 
   .login-page__title {
-    margin-bottom: 35px;
+    padding: 15px 25px;
     text-align: center;
+    background-color: #A5A5A5;
 
     h1 {
       display: inline-block;
       vertical-align: middle;
-      font-size: 24px;
-      font-weight: 400;
+      font-size: 17px;
+      line-height: 21px;
+      color: #5F5F5F;
     }
 
     img {
       display: inline-block;
       vertical-align: middle;
-      width: 30px;
-      height: 30px;
+      width: 20px;
+      height: 20px;
       margin-right: 5px;
     }
   }
 
-  .login-page__wrapper {
-    position: relative;
-    width: 380px;
-    border-radius: 8px;
-    border: 1px solid #dadce0;
-    margin: 150px auto 0;
-    padding: 48px 40px 36px;
-    font-size: 14px;
+  .login-page__form {
+    padding: 15px 25px 30px;
 
-    label {
-      display: inline-block;
-      font-weight: 600;
-      margin-bottom: 5px;
-      color: $green;
+    p {
+      margin-bottom: 14px;
+      font-size: 15px;
+      line-height: 21px;
+      color: #5F5F5F;
     }
+  }
+
+  .login-page__wrapper {
+    overflow: hidden;
+    position: relative;
+    max-width: 447px;
+    border: 0;
+    border-radius: 5px;
+    margin: 100px auto 0;
+    font-size: 14px;
+    background-color: #C4C4C4;
 
     input {
       display: block;
       width: 100%;
       height: 40px;
-      margin-bottom: 28px;
-      padding: 6px 8px;
+      margin-bottom: 20px;
+      padding: 6px 10px;
       border: 1px solid #dadce0;
       border-radius: 4px;
-      color: #202124;
-      line-height: 24px;
-      font-size: 16px;
+      font-size: 17px;
+      line-height: 21px;
+      letter-spacing: -0.025em;
       outline: none;
-      background-color: transparent;
+      color: #353535;
+      background-color: white;
+
+      &::placeholder {
+        color: lightgrey;
+      }
+
+      &::-webkit-input-placeholder       {opacity: 1; transition: opacity 0.3s ease;}
+      &:focus::-webkit-input-placeholder {opacity: 0; transition: opacity 0.3s ease;}
 
       &.error {
         border: 1px solid red;
@@ -148,32 +221,50 @@ export default {
     }
   }
 
-  .login-page__wrapper-clue {
-    margin: 30px auto 0;
-    padding: 10px 20px;
+  .login-page__button-wrap {
+    text-align: center;
+    margin-top: 25px;
 
-    p {
-      text-align: center;
-    }
+    button {
+      width: 397px;
+      height: 41px;
+      border: 0;
+      border-radius: 5px;
+      font-weight: 600;
+      font-size: 17px;
+      line-height: 21px;
+      letter-spacing: 0.02em;
+      background-color: #519945;
+      color: white;
 
-    b {
-      font-weight: 900;
-      color: $green;
-      font-size: 18px;
-    }
+      &:hover {
+        background-color: #3b7032;
+      }
 
-    span {
-      user-select: none;
-      display: inline-block;
-      width: 130px;
+      &:active {
+        box-shadow: 0 1px 18px 1px rgba(0, 0, 0, 0.2);
+      }
     }
   }
 
-  .login-page__button-wrap {
-    text-align: center;
+  .login-page__wrapper-clue {
+    padding: 20px 25px 15px 25px;
+    margin: 100px auto 150px;
 
-    button {
-      max-width: 246px;
+    span {
+      display: inline-block;
+      min-width: 142px;
+      margin-bottom: 0;
+      user-select: none;
+    }
+
+    b {
+      font-weight: 600;
+
+      a {
+        color: black;
+        text-decoration: underline;
+      }
     }
   }
 </style>

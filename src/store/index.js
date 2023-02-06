@@ -6,54 +6,31 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    certainUser: {},
-    users: [],
-    posts: []
+    allUsers: [],
+    currentUser: {}
   },
 
   getters: {
-    CERTAIN_USER: state => state.certainUser,
-    USERS: state => state.users,
-    POSTS: state => state.posts
-  },
-
-  actions: {
-    async getUser (context, userId) {
-      await axios.get(`https://jsonplaceholder.typicode.com/users/${userId}`)
-        .then(certainUser => {
-          context.commit('SET_CERTAIN_USER_TO_STATE', certainUser.data)
-          return certainUser.data
-        })
-    },
-
-    async getUsers (context) {
-      await axios.get('https://jsonplaceholder.typicode.com/users')
-        .then(users => {
-          context.commit('SET_USERS_TO_STATE', users.data)
-          return users.data
-        })
-    },
-
-    getPosts (context) {
-      axios.get('https://jsonplaceholder.typicode.com/posts')
-        .then(posts => {
-          context.commit('SET_POSTS_TO_STATE', posts.data)
-          return posts.data
-        })
-    }
+    ALL_USERS: state => state.allUsers,
+    CURRENT_USER: state => state.currentUser
   },
 
   mutations: {
-    SET_CERTAIN_USER_TO_STATE (state, certainUser) {
-      state.certainUser = certainUser
+    SET_ALL_USERS (state, users) {
+      state.allUsers = users
     },
 
-    SET_USERS_TO_STATE (state, users) {
-      state.users = users
-    },
+    setCurrentUser (state, currentUser) {
+      state.currentUser = currentUser
+    }
+  },
 
-    SET_POSTS_TO_STATE (state, posts) {
-      state.posts = posts
+  actions: {
+    async getUsers (context) {
+      await axios.get('https://jsonplaceholder.typicode.com/users').then(users => {
+        context.commit('SET_ALL_USERS', users.data)
+        return users.data
+      })
     }
   }
 })
