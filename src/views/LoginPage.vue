@@ -9,7 +9,7 @@
       </div>
 
       <form id="form" class="login-page__form" @submit.prevent>
-        <p>{{ loginPage.form.description }}</p>
+        <p class="form-description">{{ loginPage.form.description }}</p>
         <input id="username"
                type="text"
                :placeholder="loginPage.form.usernamePlaceholder"
@@ -25,7 +25,10 @@
     </div>
 
     <div class="login-page__wrapper login-page__wrapper-clue">
-      <p>If you don't remember...</p>
+      <span>If you don't remember... </span>
+      <b class="bold-text">
+        <a target="_blank" href="https://jsonplaceholder.typicode.com/users">Users</a>
+      </b>
       <br>
       <div>
         <span>Test username: </span>
@@ -34,11 +37,6 @@
       <div>
         <span>Test phone number: </span>
         <b>{{ loginPage.phoneNumberExample }}</b>
-      </div>
-      <br>
-      <div>
-        <span>JsonPlaceholder:</span>
-        <b><a target="_blank" href="https://jsonplaceholder.typicode.com/users">Users</a></b>
       </div>
     </div>
 
@@ -138,6 +136,13 @@ export default {
         this.setCurrentUserToState()
 
         localStorage.setItem('signIn', true)
+
+        this.$router.push({
+          name: 'UserTodoListPage',
+          params: {
+            id: this.loginPage.currentUser.id
+          }
+        })
       } else {
         localStorage.setItem('signIn', false)
       }
@@ -148,7 +153,8 @@ export default {
 
 <style lang="scss" scoped>
   /* Variables */
-  $main-green: #42b983;
+  $green: #519945;
+  $dark-green: #3b7032;
 
   .login-page__title {
     padding: 15px 25px;
@@ -175,7 +181,7 @@ export default {
   .login-page__form {
     padding: 15px 25px 30px;
 
-    p {
+    .form-description {
       margin-bottom: 14px;
       font-size: 15px;
       line-height: 21px;
@@ -234,11 +240,11 @@ export default {
       font-size: 17px;
       line-height: 21px;
       letter-spacing: 0.02em;
-      background-color: #519945;
+      background-color: $green;
       color: white;
 
       &:hover {
-        background-color: #3b7032;
+        background-color: $dark-green;
       }
 
       &:active {
@@ -251,20 +257,8 @@ export default {
     padding: 20px 25px 15px 25px;
     margin: 100px auto 150px;
 
-    span {
-      display: inline-block;
-      min-width: 142px;
-      margin-bottom: 0;
-      user-select: none;
-    }
-
-    b {
+    .bold-text {
       font-weight: 600;
-
-      a {
-        color: black;
-        text-decoration: underline;
-      }
     }
   }
 </style>

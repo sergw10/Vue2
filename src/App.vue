@@ -15,7 +15,8 @@ export default {
   // Variables
   $body-background-color: #828282;
   $border-color: #dadce0;
-  $green: #42b983;
+  $green: #519945;
+  $dark-green: #3b7032;
 
   // Reset CSS
   *, *:before, *:after {
@@ -57,11 +58,12 @@ export default {
 
   a {
     display: inline-block;
-    text-decoration: none;
-    transition: hover .7s;
+    text-decoration: underline;
+    transition: .4s;
     color: $green;
+
     &:hover {
-      color: #3ca172;
+      color: $dark-green;
       text-decoration: underline;
     }
   }
@@ -128,5 +130,11 @@ export default {
     margin-top: -270px;
     height: 270px;
     background-color: #474747;
+  }
+
+  .container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 15px;
   }
 </style>
