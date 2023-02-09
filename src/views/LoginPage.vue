@@ -19,7 +19,7 @@
                :placeholder="loginPage.form.phoneNumberPlaceholder"
                v-model="loginPage.userPhoneNumberValue">
         <div class="login-page__button-wrap">
-          <button @click="logIn()" type="button">{{ loginPage.form.btnText }}</button>
+          <button @click="logIn()" class="btn-green" type="button">{{ loginPage.form.btnText }}</button>
         </div>
       </form>
     </div>
@@ -30,13 +30,15 @@
         <a target="_blank" href="https://jsonplaceholder.typicode.com/users">Users</a>
       </b>
       <br>
+      <br>
       <div>
         <span>Test username: </span>
-        <b>{{ loginPage.usernameExample }}</b>
+        <b class="bold-text">{{ loginPage.usernameExample }}</b>
       </div>
+      <br>
       <div>
         <span>Test phone number: </span>
-        <b>{{ loginPage.phoneNumberExample }}</b>
+        <b class="bold-text">{{ loginPage.phoneNumberExample }}</b>
       </div>
     </div>
 
@@ -94,10 +96,6 @@ export default {
       'getUsers'
     ]),
 
-    setCurrentUserToState () {
-      this.$store.commit('setCurrentUser', this.loginPage.currentUser)
-    },
-
     defineCurrentUser () {
       const usernameValue = this.loginPage.usernameValue
       const userPhoneNumberValue = this.loginPage.userPhoneNumberValue
@@ -114,6 +112,7 @@ export default {
 
     validateUserName () {
       const usernameValue = this.loginPage.usernameValue
+
       return this.ALL_USERS.some(function (users) {
         return users.username === usernameValue
       })
@@ -121,6 +120,7 @@ export default {
 
     validatePhoneNumber () {
       const userPhoneNumberValue = this.loginPage.userPhoneNumberValue
+
       return this.ALL_USERS.some(function (users) {
         return users.phone === userPhoneNumberValue
       })
@@ -143,9 +143,16 @@ export default {
             id: this.loginPage.currentUser.id
           }
         })
+
+        this.loginPage.usernameValue = ''
+        this.loginPage.userPhoneNumberValue = ''
       } else {
         localStorage.setItem('signIn', false)
       }
+    },
+
+    setCurrentUserToState () {
+      this.$store.commit('setCurrentUser', this.loginPage.currentUser)
     }
   }
 }
@@ -200,6 +207,7 @@ export default {
     background-color: #C4C4C4;
 
     input {
+      transition: border 0.4s ease;
       display: block;
       width: 100%;
       height: 40px;
@@ -213,6 +221,10 @@ export default {
       outline: none;
       color: #353535;
       background-color: white;
+
+      &:focus {
+        border-color: #909090;
+      }
 
       &::placeholder {
         color: lightgrey;
@@ -234,28 +246,16 @@ export default {
     button {
       width: 397px;
       height: 41px;
-      border: 0;
-      border-radius: 5px;
-      font-weight: 600;
-      font-size: 17px;
-      line-height: 21px;
-      letter-spacing: 0.02em;
-      background-color: $green;
-      color: white;
-
-      &:hover {
-        background-color: $dark-green;
-      }
-
-      &:active {
-        box-shadow: 0 1px 18px 1px rgba(0, 0, 0, 0.2);
-      }
     }
   }
 
   .login-page__wrapper-clue {
     padding: 20px 25px 15px 25px;
     margin: 100px auto 150px;
+
+    span {
+      user-select: none;
+    }
 
     .bold-text {
       font-weight: 600;

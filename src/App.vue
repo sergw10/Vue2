@@ -25,7 +25,9 @@ export default {
     box-sizing: border-box;
   }
 
-  html, body, div, span, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, img, b, i, ol, ul, li, form, label, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, footer, header, hgroup, menu, nav, section, audio, video {
+  html, body, div, span, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, img, b, i, ol, ul, li, form, label,
+  table, caption, tbody, tfoot, thead, tr, th, td, article, aside, footer, header, hgroup, menu, nav, section, audio,
+  video {
     margin: 0;
     padding: 0;
     border: 0;
@@ -78,8 +80,13 @@ export default {
     text-align: center;
     padding: 8px 24px;
     border: 0;
+    border-radius: 5px;
     outline: 0;
     transition: .3s;
+    font-weight: 600;
+    font-size: 17px;
+    line-height: 21px;
+    letter-spacing: 0.02em;
     cursor: pointer;
 
     &.btn-green {
@@ -87,14 +94,30 @@ export default {
       background-color: $green;
 
       &:hover {
-        background-color: #4ccd92;
+        background-color: $dark-green;
       }
 
       &:active {
-        background-color: #3ca172;
-        box-shadow: 0 1px 2px 0 rgba(66,185,131,.3), 0 2px 6px 2px rgba(66,185,131,0.15);
+        box-shadow: 0 1px 18px 1px rgba(0, 0, 0, 0.2);
       }
     }
+
+    &.btn-red {
+      color: white;
+      background-color: #ce2525;
+
+      &:hover {
+        background-color: #a60202;
+      }
+
+      &:active {
+        box-shadow: 0 1px 18px 1px rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+
+  br {
+    user-select: none;
   }
 
   textarea {
@@ -106,14 +129,36 @@ export default {
   }
 
   input:-webkit-autofill {
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 17px;
+    line-height: 21px;
+    letter-spacing: -0.025em;
+    outline: none;
     -webkit-text-fill-color: #363b43 !important;
+    background-color: white;
 
     &, &:hover, &:focus, &:active {
       -webkit-box-shadow: 0 0 0 20px white inset !important;
     }
+
+    &::placeholder {
+      color: lightgrey;
+    }
+
+    &::-webkit-input-placeholder       { opacity: 1; transition: opacity 0.3s ease; }
+    &:focus::-webkit-input-placeholder { opacity: 0; transition: opacity 0.3s ease; }
+
+    &.error {
+      border: 1px solid red;
+    }
   }
 
   /* Classes */
+  #app {
+    height: 100%;
+  }
+
   .main-wrapper {
     min-height: 100%;
     padding-bottom: 270px;

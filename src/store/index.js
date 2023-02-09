@@ -30,8 +30,20 @@ export default new Vuex.Store({
       state.currentUser = currentUser
     },
 
-    setCurrentUserTodoItems (state, currentUser) {
-      state.currentUser = currentUser
+    setNewTodoItem (state, newTodoOptions) {
+      state.allTodoItems.push(newTodoOptions)
+    },
+
+    addFavoriteItemToState (state, todoItemId) {
+      state.allTodoItems[todoItemId - 1] = Object.assign({}, state.allTodoItems[todoItemId - 1], {
+        favorites: true
+      })
+    },
+
+    removeFavoriteItemFromState (state, todoItemId) {
+      state.allTodoItems[todoItemId - 1] = Object.assign({}, state.allTodoItems[todoItemId - 1], {
+        favorites: false
+      })
     }
   },
 
