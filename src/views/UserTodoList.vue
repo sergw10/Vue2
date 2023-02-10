@@ -4,68 +4,69 @@
 
       <!-- Current User Info -->
       <div class="user-info--wrapper">
-        <div class="user-info--item">
-          <span class="user-info--item-title">Username:</span>
-          <span>{{ CURRENT_USER.username }}</span>
-        </div>
-        <div class="user-info--item">
-          <span class="user-info--item-title">Name:</span>
-          <span>{{ CURRENT_USER.name }}</span>
-        </div>
-        <div class="user-info--item">
-          <span class="user-info--item-title">User ID:</span>
-          <span>{{ CURRENT_USER.id }}</span>
+        <div class="user-info--block">
+          <div class="user-info--item">
+            <span class="user-info--item-title">Username:</span>
+            <span>{{ CURRENT_USER.username }}</span>
+          </div>
+          <div class="user-info--item">
+            <span class="user-info--item-title">Name:</span>
+            <span>{{ CURRENT_USER.name }}</span>
+          </div>
+          <div class="user-info--item">
+            <span class="user-info--item-title">User ID:</span>
+            <span>{{ CURRENT_USER.id }}</span>
+          </div>
+          <br>
+
+          <div class="user-info--item">
+            <span class="user-info--item-title">Email:</span>
+            <span>
+              <a class="user-info--item-link" :href="`mailto:` + CURRENT_USER.email">{{ CURRENT_USER.email }}</a>
+            </span>
+          </div>
+          <div class="user-info--item">
+            <span class="user-info--item-title">Phone:</span>
+            <span>
+              <a class="user-info--item-link" :href="`tel:` + CURRENT_USER.phone">{{ CURRENT_USER.phone }}</a>
+            </span>
+          </div>
+          <div class="user-info--item">
+            <span class="user-info--item-title">Website:</span>
+            <span>
+              <a class="user-info--item-link" :href="`http://` + CURRENT_USER.website">{{ CURRENT_USER.website }}</a>
+            </span>
+          </div>
+          <br>
         </div>
 
-        <br>
+        <div class="user-info--block">
+          <div class="user-info--item">
+            <span class="user-info--item-title">City:</span>
+            <span>{{ CURRENT_USER.address.city }}</span>
+          </div>
+          <div class="user-info--item">
+            <span class="user-info--item-title">Street:</span>
+            <span>{{ CURRENT_USER.address.street }}</span>
+          </div>
+          <div class="user-info--item">
+            <span class="user-info--item-title">Suite:</span>
+            <span>{{ CURRENT_USER.address.suite }}</span>
+          </div>
+          <div class="user-info--item">
+            <span class="user-info--item-title">Zipcode:</span>
+            <span>{{ CURRENT_USER.address.zipcode }}</span>
+          </div>
+          <br>
 
-        <div class="user-info--item">
-          <span class="user-info--item-title">Email:</span>
-          <span>
-            <a class="user-info--item-link" :href="`mailto:` + CURRENT_USER.email">{{ CURRENT_USER.email }}</a>
-          </span>
-        </div>
-        <div class="user-info--item">
-          <span class="user-info--item-title">Phone:</span>
-          <span>
-            <a class="user-info--item-link" :href="`tel:` + CURRENT_USER.phone">{{ CURRENT_USER.phone }}</a>
-          </span>
-        </div>
-        <div class="user-info--item">
-          <span class="user-info--item-title">Website:</span>
-          <span>
-            <a class="user-info--item-link" :href="`http://` + CURRENT_USER.website">{{ CURRENT_USER.website }}</a>
-          </span>
-        </div>
-
-        <br>
-
-        <div class="user-info--item">
-          <span class="user-info--item-title">City:</span>
-          <span>{{ CURRENT_USER.address.city }}</span>
-        </div>
-        <div class="user-info--item">
-          <span class="user-info--item-title">Street:</span>
-          <span>{{ CURRENT_USER.address.street }}</span>
-        </div>
-        <div class="user-info--item">
-          <span class="user-info--item-title">Suite:</span>
-          <span>{{ CURRENT_USER.address.suite }}</span>
-        </div>
-        <div class="user-info--item">
-          <span class="user-info--item-title">Zipcode:</span>
-          <span>{{ CURRENT_USER.address.zipcode }}</span>
-        </div>
-
-        <br>
-
-        <div class="user-info--item">
-          <span class="user-info--item-title">Geo lat:</span>
-          <span>{{ CURRENT_USER.address.geo.lat }}</span>
-        </div>
-        <div class="user-info--item">
-          <span class="user-info--item-title">Geo lng:</span>
-          <span>{{ CURRENT_USER.address.geo.lng }}</span>
+          <div class="user-info--item">
+            <span class="user-info--item-title">Geo lat:</span>
+            <span>{{ CURRENT_USER.address.geo.lat }}</span>
+          </div>
+          <div class="user-info--item">
+            <span class="user-info--item-title">Geo lng:</span>
+            <span>{{ CURRENT_USER.address.geo.lng }}</span>
+          </div>
         </div>
       </div>
 
@@ -96,6 +97,7 @@
                     class="filter-userId--select"
                     @change="onChangeUserIdSelect($event)"
                     v-model="userIdFilterSelect">
+              <option selected value="">--- empty value ---</option>
               <option v-for="option in userIdFilterSelectOptions"
                       v-bind:value="option.value"
                       :key="option.id">{{ option.text }}</option>
@@ -119,7 +121,7 @@
           </div>
 
           <!-- Table Body -->
-          <div class="todo-list--table-body">
+          <div class="todo-list--table-body" v-if="searchResultList.length">
             <div v-for="todoItem in searchResultList" :key="todoItem.id" class="todo-list--table-item">
               <div class="todo-list--table-item-id">
                 <span>{{ todoItem.id }}</span>
@@ -141,6 +143,9 @@
               <div class="todo-list--table-item-status text-green" v-if="todoItem.completed">Completed</div>
               <div class="todo-list--table-item-status text-red" v-else>Uncompleted</div>
             </div>
+          </div>
+          <div class="todo-list--table-body" v-else>
+            <div class="todo-list--table-empty-text">No data found... :(</div>
           </div>
 
         </div>
@@ -186,7 +191,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'UserTodoList',
@@ -213,11 +218,15 @@ export default {
     }
   },
 
-  methods: {
-    ...mapActions([
-      'getTodoItems'
-    ]),
+  computed: {
+    ...mapGetters([
+      'ALL_USERS',
+      'CURRENT_USER',
+      'All_TODO_ITEMS'
+    ])
+  },
 
+  methods: {
     setSearchOptions (title, status, userId) {
       this.searchOptions = {
         title,
@@ -339,16 +348,7 @@ export default {
     }
   },
 
-  computed: {
-    ...mapGetters([
-      'ALL_USERS',
-      'CURRENT_USER',
-      'All_TODO_ITEMS'
-    ])
-  },
-
   mounted () {
-    this.getTodoItems()
     this.setTodoItemsInTableFromState()
 
     this.setIdsToSelect()
@@ -384,6 +384,7 @@ export default {
 
   .user-info--item-title {
     display: inline-block;
+    min-width: 96px;
     width: 96px;
     font-weight: 600;
   }
@@ -488,6 +489,13 @@ export default {
     overflow: hidden auto;
     padding-right: 5px;
     margin-bottom: 8px;
+  }
+
+  .todo-list--table-empty-text {
+    text-align: center;
+    margin: 20px 0 0;
+    font-size: 18px;
+    font-weight: 600;
   }
 
   .todo-list--table-item {
@@ -651,6 +659,64 @@ export default {
 
     button {
       min-width: 110px;
+    }
+  }
+
+  @media (max-width: 1150px) {
+    .user-info--wrapper {
+      min-width: 280px;
+    }
+
+    .todo-list--wrapper {
+      margin-left: 15px;
+    }
+
+    .todo-list--table-item-userId {
+      width: 12%;
+    }
+
+    .todo-list--table-item-title {
+      width: 48%;
+    }
+
+    .todo-list--table-item-favorite {
+      width: 15%;
+    }
+  }
+
+  @media (max-width: 1100px) {
+    .user-todo--page {
+      margin-top: 15px;
+      margin-bottom: 60px;
+      flex-wrap: wrap;
+    }
+
+    .user-info--wrapper {
+      display: flex;
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 15px;
+    }
+
+    .user-info--block {
+      width: 50%;
+      padding-right: 15px;
+
+      br {
+        display: none;
+      }
+    }
+
+    .todo-list--wrapper {
+      margin-left: 0;
+    }
+
+    .todo-list--table-settings {
+      padding: 15px;
+    }
+
+    .todo-list--table {
+      padding: 10px 15px;
     }
   }
 </style>

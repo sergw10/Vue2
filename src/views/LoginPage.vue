@@ -83,17 +83,20 @@ export default {
 
   created () {
     this.getUsers()
+    this.getAllTodoItems()
   },
 
   computed: {
     ...mapGetters([
-      'ALL_USERS'
+      'ALL_USERS',
+      'All_TODO_ITEMS'
     ])
   },
 
   methods: {
     ...mapActions([
-      'getUsers'
+      'getUsers',
+      'getAllTodoItems'
     ]),
 
     defineCurrentUser () {
@@ -259,6 +262,23 @@ export default {
 
     .bold-text {
       font-weight: 600;
+    }
+  }
+
+  @media (max-width: 515px) {
+    .login-page__button-wrap button {
+      width: 100%;
+    }
+
+    .login-page__wrapper {
+      margin-top: 50px;
+      max-width: 90%;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .login-page__form {
+      padding: 15px 15px 25px;
     }
   }
 </style>

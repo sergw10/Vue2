@@ -45,7 +45,6 @@ export default {
     -webkit-text-size-adjust: none;
     font-size: 16px;
     line-height: 1.154;
-    letter-spacing: .25px;
     font-weight: 400;
     background-color: $body-background-color;
   }

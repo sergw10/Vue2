@@ -55,7 +55,7 @@ export default new Vuex.Store({
       })
     },
 
-    async getTodoItems (context) {
+    async getAllTodoItems (context) {
       await axios.get('https://jsonplaceholder.typicode.com/todos').then(todoItems => {
         context.commit('setAllTodoItems', todoItems.data)
         return todoItems.data
