@@ -108,7 +108,7 @@ export default {
       'getAllTodoItems'
     ]),
 
-    defineCurrentUser () {
+    _defineCurrentUser () {
       const usernameValue = this.loginPage.usernameValue
       const userPhoneNumberValue = this.loginPage.userPhoneNumberValue
       let currentUser = {}
@@ -122,7 +122,7 @@ export default {
       this.loginPage.currentUser = currentUser
     },
 
-    validateUserName () {
+    _validateUserName () {
       const usernameValue = this.loginPage.usernameValue
 
       const result = this.ALL_USERS.some(function (users) {
@@ -133,7 +133,7 @@ export default {
       return result
     },
 
-    validatePhoneNumber () {
+    _validatePhoneNumber () {
       const userPhoneNumberValue = this.loginPage.userPhoneNumberValue
 
       const result = this.ALL_USERS.some(function (users) {
@@ -144,8 +144,8 @@ export default {
       return result
     },
 
-    validateForm () {
-      return this.validateUserName() && this.validatePhoneNumber()
+    _validateForm () {
+      return this._validateUserName() && this._validatePhoneNumber()
     },
 
     noDigits (event) {
@@ -153,11 +153,9 @@ export default {
     },
 
     logIn () {
-      if (this.validateForm()) {
-        this.defineCurrentUser()
-        this.setCurrentUserToState()
-
-        localStorage.setItem('signIn', true)
+      if (this._validateForm()) {
+        this._defineCurrentUser()
+        this._setCurrentUserToState()
 
         this.$router.push({
           name: 'UserTodoListPage',
@@ -168,12 +166,10 @@ export default {
 
         this.loginPage.usernameValue = ''
         this.loginPage.userPhoneNumberValue = ''
-      } else {
-        localStorage.setItem('signIn', false)
       }
     },
 
-    setCurrentUserToState () {
+    _setCurrentUserToState () {
       this.$store.commit('setCurrentUser', this.loginPage.currentUser)
     }
   }

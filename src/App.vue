@@ -81,7 +81,7 @@ export default {
     border: 0;
     border-radius: 5px;
     outline: 0;
-    transition: .3s;
+    transition: .35s ease;
     font-weight: 600;
     font-size: 17px;
     line-height: 21px;
@@ -97,7 +97,7 @@ export default {
       }
 
       &:active {
-        box-shadow: 0 1px 18px 1px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 1px 18px 1px rgba(0, 0, 0, 0.15);
       }
     }
 
@@ -110,7 +110,7 @@ export default {
       }
 
       &:active {
-        box-shadow: 0 1px 18px 1px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 1px 18px 1px rgba(0, 0, 0, 0.15);
       }
     }
   }
@@ -142,7 +142,7 @@ export default {
     }
 
     &::placeholder {
-      color: lightgrey;
+      color: #c0c0c0;
     }
 
     &::-webkit-input-placeholder       { opacity: 1; transition: opacity 0.3s ease; }
