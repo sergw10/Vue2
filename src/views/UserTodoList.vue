@@ -75,36 +75,42 @@
         <!-- To-Do Table Settings -->
         <div class="todo-list--table-settings">
           <div class="filter-title--wrap">
-            <input class="title-search--field" placeholder="Search title..." type="text">
+            <label for="title-search--field">Search</label>
+            <input id="title-search--field" class="title-search--field" placeholder="Search title..." type="text">
           </div>
 
-          <div class="filter-status--select-wrap">
-            <label for="filter-status--select">Select Status</label>
-            <select id="filter-status--select"
-                    class="filter-status--select"
-                    @change="onChangeStatusSelect($event)"
-                    v-model="statusFilterSelect">
-              <option value="all">All</option>
-              <option value="completed">Completed</option>
-              <option value="uncompleted">Uncompleted</option>
-              <option value="favorites">Favorites</option>
-            </select>
+          <div class="selects-wrap">
+            <div class="filter-status--select-wrap">
+              <label for="filter-status--select">Select Status</label>
+              <select id="filter-status--select"
+                      class="filter-status--select"
+                      @change="onChangeStatusSelect($event)"
+                      v-model="statusFilterSelect">
+                <option disabled selected value="">--- select status ---</option>
+                <option value="all">All</option>
+                <option value="completed">Completed</option>
+                <option value="uncompleted">Uncompleted</option>
+                <option value="favorites">Favorites</option>
+              </select>
+            </div>
+
+            <div class="filter-userId--select-wrap">
+              <label for="filter-userId--select">Select User ID</label>
+              <select id="filter-userId--select"
+                      class="filter-userId--select"
+                      @change="onChangeUserIdSelect($event)"
+                      v-model="userIdFilterSelect">
+                <option selected value="">--- empty value ---</option>
+                <option v-for="option in userIdFilterSelectOptions"
+                        v-bind:value="option.value"
+                        :key="option.id">{{ option.text }}</option>
+              </select>
+            </div>
           </div>
 
-          <div class="filter-userId--select-wrap">
-            <label for="filter-userId--select">Select User ID</label>
-            <select id="filter-userId--select"
-                    class="filter-userId--select"
-                    @change="onChangeUserIdSelect($event)"
-                    v-model="userIdFilterSelect">
-              <option selected value="">--- empty value ---</option>
-              <option v-for="option in userIdFilterSelectOptions"
-                      v-bind:value="option.value"
-                      :key="option.id">{{ option.text }}</option>
-            </select>
-          </div>
           <div class="table-settings--btn-wrapper">
             <button @click="openPopupNewTodo()" type="button" class="open-popup--btn btn-green">Create Todo</button>
+            <button @click="openPopupNewTodo()" type="button" class="open-popup--btn-mobile btn-green">+</button>
           </div>
         </div>
 
@@ -113,8 +119,14 @@
 
           <!-- Table Header -->
           <div class="todo-list--table-header">
-            <div class="todo-list--table-item-id">Item ID</div>
-            <div class="todo-list--table-item-userId">User ID</div>
+            <div class="todo-list--table-item-id">
+              <span class="text">Item ID</span>
+              <span class="mobile-text">I/ID</span>
+            </div>
+            <div class="todo-list--table-item-userId">
+              <span class="text">User ID</span>
+              <span class="mobile-text">U/ID</span>
+            </div>
             <div class="todo-list--table-item-title">Title</div>
             <div class="todo-list--table-item-favorite">Favorites</div>
             <div class="todo-list--table-item-status">Status</div>
@@ -142,6 +154,10 @@
 
               <div class="todo-list--table-item-status text-green" v-if="todoItem.completed">Completed</div>
               <div class="todo-list--table-item-status text-red" v-else>Uncompleted</div>
+
+              <!-- For mobile -->
+              <div class="todo-list--table-item-status-mobile text-green" v-if="todoItem.completed"><div></div></div>
+              <div class="todo-list--table-item-status-mobile text-red" v-else><div></div></div>
             </div>
           </div>
           <div class="todo-list--table-body" v-else>
@@ -198,7 +214,6 @@ export default {
 
   data () {
     return {
-      currentUserTodoItems: [],
       searchResultList: [],
       searchOptions: {
         title: '',
@@ -227,29 +242,12 @@ export default {
   },
 
   methods: {
-    setSearchOptions (title, status, userId) {
-      this.searchOptions = {
-        title,
-        status,
-        userId
-      }
-    },
-
-    setIdsToSelect () {
-      for (let i = 0; i < this.ALL_USERS.length; i++) {
-        this.userIdFilterSelectOptions[i] = {
-          value: this.ALL_USERS[i].id,
-          text: this.ALL_USERS[i].id
-        }
-      }
-    },
-
     onChangeStatusSelect (event) {
-      this.setSearchOptions(this.searchOptions.title, event.target.value, this.searchOptions.userId)
-      this.filterSearchResultItems()
+      this._setSearchOptions(this.searchOptions.title, event.target.value, this.searchOptions.userId)
+      this._filterSearchResultItems()
     },
 
-    filterSearchResultItems () {
+    _filterSearchResultItems () {
       const searchOptionUserId = this.searchOptions.userId
 
       /* Status filtering */
@@ -277,27 +275,38 @@ export default {
       }
     },
 
-    addNewIdToUserIdSelect (NewId) {
+    onChangeUserIdSelect (event) {
+      this._setSearchOptions(this.searchOptions.title, this.searchOptions.status, event.target.value)
+      this._filterSearchResultItems()
+    },
+
+    _setSearchOptions (title, status, userId) {
+      this.searchOptions = {
+        title,
+        status,
+        userId
+      }
+    },
+
+    _setIdsToSelect () {
+      for (let i = 0; i < this.ALL_USERS.length; i++) {
+        this.userIdFilterSelectOptions[i] = {
+          value: this.ALL_USERS[i].id,
+          text: this.ALL_USERS[i].id
+        }
+      }
+    },
+
+    _setTodoItemsInTableFromState () {
+      this.searchResultList = this.All_TODO_ITEMS
+    },
+
+    _addNewIdToUserIdSelect (NewId) {
       const newIndex = this.userIdFilterSelectOptions.length + 1
       this.userIdFilterSelectOptions[newIndex] = {
         value: NewId,
         text: NewId
       }
-    },
-
-    onChangeUserIdSelect (event) {
-      this.setSearchOptions(this.searchOptions.title, this.searchOptions.status, event.target.value)
-      this.filterSearchResultItems()
-    },
-
-    openPopupNewTodo () {
-      this.isAddNewItemPopupOpen = true
-    },
-
-    closeModal () {
-      this.isAddNewItemPopupOpen = false
-      this.newTodoUserId = ''
-      this.newTodoTitle = ''
     },
 
     addNewTodoItemToState () {
@@ -313,9 +322,21 @@ export default {
       }
 
       this.$store.commit('setNewTodoItem', newTodoOptions)
-      this.addNewIdToUserIdSelect(this.newTodoUserId)
+      this._addNewIdToUserIdSelect(this.newTodoUserId)
 
       this.closeModal()
+    },
+
+    addItemToFavorite (todoItemId) {
+      this.$store.commit('addFavoriteItemToState', +todoItemId)
+      this.$forceUpdate()
+      this._setTodoItemsInTableFromState()
+    },
+
+    removeItemFromFavorite (todoItemId) {
+      this.$store.commit('removeFavoriteItemFromState', +todoItemId)
+      this.$forceUpdate()
+      this._setTodoItemsInTableFromState()
     },
 
     isNumber (event) {
@@ -327,31 +348,20 @@ export default {
       }
     },
 
-    setTodoItemsInTableFromState () {
-      this.searchResultList = this.All_TODO_ITEMS
+    openPopupNewTodo () {
+      this.isAddNewItemPopupOpen = true
     },
 
-    addItemToFavorite (todoItemId) {
-      this.$store.commit('addFavoriteItemToState', +todoItemId)
-      this.$forceUpdate()
-      this.setTodoItemsInTableFromState()
-    },
-
-    removeItemFromFavorite (todoItemId) {
-      this.$store.commit('removeFavoriteItemFromState', +todoItemId)
-      this.$forceUpdate()
-      this.setTodoItemsInTableFromState()
-    },
-
-    signOut () {
-      localStorage.setItem('signIn', false)
+    closeModal () {
+      this.isAddNewItemPopupOpen = false
+      this.newTodoUserId = ''
+      this.newTodoTitle = ''
     }
   },
 
   mounted () {
-    this.setTodoItemsInTableFromState()
-
-    this.setIdsToSelect()
+    this._setTodoItemsInTableFromState()
+    this._setIdsToSelect()
   }
 }
 </script>
@@ -413,34 +423,49 @@ export default {
     padding: 20px 25px;
     margin-bottom: 15px;
     background-color: white;
-  }
-
-  /* Select */
-  .filter-status--select-wrap,
-  .filter-userId--select-wrap {
-
-    select {
-      min-width: 120px;
-      color: black;
-      letter-spacing: 0.06em;
-    }
 
     label {
       display: block;
       font-size: 14px;
+      font-weight: 600;
       margin-bottom: 3px;
       letter-spacing: 0.03em;
+    }
+  }
+
+  /* Search */
+  .filter-title--wrap {
+  }
+
+  /* Select */
+  .selects-wrap {
+    display: flex;
+  }
+
+  .filter-status--select-wrap,
+  .filter-userId--select-wrap {
+    margin: 0 20px;
+
+    select {
+      min-width: 120px;
+      height: 30px;
+      padding: 4px;
+      border: 1px solid #b6b3b3;
+      border-radius: 4px;
+      font-size: 15px;
+      color: black;
+      cursor: pointer;
     }
   }
 
   .title-search--field {
     transition: border 0.4s ease;
     max-width: 220px;
-    height: 37px;
-    padding: 6px 10px;
+    height: 30px;
+    padding: 4px 10px;
     border: 1px solid #b6b3b3;
     border-radius: 4px;
-    font-size: 17px;
+    font-size: 14px;
     line-height: 21px;
     letter-spacing: 0.02em;
     outline: none;
@@ -457,6 +482,10 @@ export default {
 
     &::-webkit-input-placeholder       {opacity: 1; transition: opacity 0.3s ease;}
     &:focus::-webkit-input-placeholder {opacity: 0; transition: opacity 0.3s ease;}
+  }
+
+  .table-settings--btn-wrapper {
+    align-self: flex-end;
   }
 
   /* Table */
@@ -489,6 +518,34 @@ export default {
     overflow: hidden auto;
     padding-right: 5px;
     margin-bottom: 8px;
+
+    .todo-list--table-item-status-mobile {
+      display: none;
+      width: 15%;
+      height: 14px;
+      margin-top: 4px;
+      padding-right: 15px;
+      text-align: right;
+
+      &.text-red {
+        div {
+          background-color: red;
+        }
+      }
+
+      &.text-green {
+        div {
+          background-color: #25a50f;
+        }
+      }
+
+      div {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%
+      }
+    }
   }
 
   .todo-list--table-empty-text {
@@ -508,12 +565,13 @@ export default {
     padding: 8px 10px;
   }
 
-  .todo-list--table-item-id {
-    width: 10%;
-  }
-
+  .todo-list--table-item-id,
   .todo-list--table-item-userId {
     width: 10%;
+
+    .mobile-text {
+      display: none;
+    }
   }
 
   .todo-list--table-item-title {
@@ -642,6 +700,18 @@ export default {
     }
   }
 
+  .open-popup--btn-mobile {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    padding: 0;
+    margin: 0 0 0 auto;
+    font-size: 25px;
+  }
+
   .new-todo--popup-title {
     text-align: center;
     margin-bottom: 20px;
@@ -684,7 +754,7 @@ export default {
     }
   }
 
-  @media (max-width: 1100px) {
+  @media (max-width: 1130px) {
     .user-todo--page {
       margin-top: 15px;
       margin-bottom: 60px;
@@ -717,6 +787,135 @@ export default {
 
     .todo-list--table {
       padding: 10px 15px;
+    }
+  }
+
+  @media (max-width: 840px) {
+    .filter-userId--select-wrap {
+      margin-right: 0;
+    }
+
+    .open-popup--btn {
+      display: none;
+    }
+
+    .open-popup--btn-mobile {
+      padding-top: 2px;
+      display: flex;
+    }
+  }
+
+  @media (max-width: 730px) {
+    .todo-list--table-settings {
+      position: relative;
+      flex-direction: column-reverse;
+    }
+
+    .todo-list--table-item-userId,
+    .todo-list--table-item-id {
+
+      .text {
+        display: none;
+      }
+
+      .mobile-text {
+        display: inline;
+      }
+    }
+
+    .todo-list--table-header {
+
+      .todo-list--table-item-favorite {
+        display: none;
+      }
+
+      .todo-list--table-item-status {
+        width: 30%;
+      }
+    }
+
+    .todo-list--table-body {
+
+      .todo-list--table-item-status {
+        display: none;
+      }
+
+      .todo-list--table-item-status-mobile {
+        display: inline-block;
+      }
+    }
+
+    .selects-wrap {
+      width: 100%;
+      padding-right: 55px;
+    }
+
+    .table-settings--btn-wrapper {
+      position: absolute;
+      top: 25px;
+      right: 15px;
+    }
+
+    .filter-title--wrap,
+    .title-search--field {
+      width: 100%;
+      max-width: none;
+    }
+
+    .filter-title--wrap {
+      margin-top: 15px;
+    }
+
+    .filter-status--select-wrap {
+      margin: 0;
+    }
+
+    .filter-userId--select-wrap {
+      margin: 0 30px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .user-info--wrapper {
+      flex-wrap: wrap;
+    }
+    .user-info--block {
+      width: 100%;
+      padding: 0;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .selects-wrap {
+      flex-wrap: wrap;
+      flex-direction: column;
+    }
+
+    .filter-status--select-wrap {
+      margin-bottom: 15px;
+    }
+
+    .filter-userId--select-wrap {
+      margin: 0;
+    }
+
+    .filter-status--select-wrap,
+    .filter-userId--select-wrap {
+
+      select {
+        min-width: 0;
+        width: 200px;
+      }
+    }
+  }
+
+  @media (max-width: 400px) {
+    .filter-status--select-wrap,
+    .filter-userId--select-wrap {
+
+      select {
+        width: 100%;
+      }
     }
   }
 </style>
