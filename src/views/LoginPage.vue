@@ -1,30 +1,37 @@
 <template>
   <div>
 
-    <div class="login-page__wrapper">
+    <div class="login-page--wrapper">
 
-      <div class="login-page__title">
+      <div class="login-page--title">
         <img src="@/assets/logo.png" alt="Vue logo">
         <h1>{{ loginPage.form.title }}</h1>
       </div>
 
-      <form id="form" class="login-page__form" @submit.prevent>
+      <form id="form" class="login-page--form" @submit.prevent>
         <p class="form-description">{{ loginPage.form.description }}</p>
-        <input id="username"
-               type="text"
-               :placeholder="loginPage.form.usernamePlaceholder"
-               v-model="loginPage.usernameValue">
-        <input id="phoneNumber"
-               type="text"
-               :placeholder="loginPage.form.phoneNumberPlaceholder"
-               v-model="loginPage.userPhoneNumberValue">
-        <div class="login-page__button-wrap">
+        <div class="login-page--input-block" :class="{ error: !loginPage.isValidUserName }">
+          <input id="username"
+                 type="text"
+                 :placeholder="loginPage.form.usernamePlaceholder"
+                 @keypress="noDigits($event)"
+                 v-model="loginPage.usernameValue">
+          <span class="error-text">Error name</span>
+        </div>
+        <div class="login-page--input-block" :class="{ error: !loginPage.isValidPhone}">
+          <input id="phoneNumber"
+                 type="text"
+                 :placeholder="loginPage.form.phoneNumberPlaceholder"
+                 v-model="loginPage.userPhoneNumberValue">
+          <span class="error-text">Error phone</span>
+        </div>
+        <div class="login-page--button-wrap">
           <button @click="logIn()" class="btn-green" type="button">{{ loginPage.form.btnText }}</button>
         </div>
       </form>
     </div>
 
-    <div class="login-page__wrapper login-page__wrapper-clue">
+    <div class="login-page--wrapper login-page--wrapper-clue">
       <span>If you don't remember... </span>
       <b class="bold-text">
         <a target="_blank" href="https://jsonplaceholder.typicode.com/users">Users</a>
@@ -58,6 +65,8 @@ export default {
         currentUser: {},
         usernameValue: '',
         userPhoneNumberValue: '',
+        isValidUserName: true,
+        isValidPhone: true,
 
         /* Example text */
         usernameExample: 'Bret',
@@ -116,21 +125,31 @@ export default {
     validateUserName () {
       const usernameValue = this.loginPage.usernameValue
 
-      return this.ALL_USERS.some(function (users) {
+      const result = this.ALL_USERS.some(function (users) {
         return users.username === usernameValue
       })
+
+      this.loginPage.isValidUserName = result
+      return result
     },
 
     validatePhoneNumber () {
       const userPhoneNumberValue = this.loginPage.userPhoneNumberValue
 
-      return this.ALL_USERS.some(function (users) {
+      const result = this.ALL_USERS.some(function (users) {
         return users.phone === userPhoneNumberValue
       })
+
+      this.loginPage.isValidPhone = result
+      return result
     },
 
     validateForm () {
       return this.validateUserName() && this.validatePhoneNumber()
+    },
+
+    noDigits (event) {
+      if ('1234567890'.indexOf(event.key) !== -1) event.preventDefault()
     },
 
     logIn () {
@@ -166,7 +185,7 @@ export default {
   $green: #519945;
   $dark-green: #3b7032;
 
-  .login-page__title {
+  .login-page--title {
     padding: 15px 25px;
     text-align: center;
     background-color: #A5A5A5;
@@ -188,7 +207,7 @@ export default {
     }
   }
 
-  .login-page__form {
+  .login-page--form {
     padding: 15px 25px 30px;
 
     .form-description {
@@ -199,7 +218,7 @@ export default {
     }
   }
 
-  .login-page__wrapper {
+  .login-page--wrapper {
     overflow: hidden;
     position: relative;
     max-width: 447px;
@@ -208,13 +227,33 @@ export default {
     margin: 100px auto 0;
     font-size: 14px;
     background-color: #C4C4C4;
+  }
+
+  .login-page--input-block {
+    margin-bottom: 20px;
+
+    &.error {
+      input {
+        border-color: red;
+      }
+
+      .error-text {
+        display: inline-block;
+      }
+    }
+
+    .error-text {
+      display: none;
+      margin-top: 4px;
+      font-size: 14px;
+      color: red;
+    }
 
     input {
       transition: border 0.4s ease;
       display: block;
       width: 100%;
       height: 40px;
-      margin-bottom: 20px;
       padding: 6px 10px;
       border: 1px solid #dadce0;
       border-radius: 4px;
@@ -224,10 +263,6 @@ export default {
       outline: none;
       color: #353535;
       background-color: white;
-
-      &:focus {
-        border-color: #909090;
-      }
 
       &::placeholder {
         color: lightgrey;
@@ -242,7 +277,7 @@ export default {
     }
   }
 
-  .login-page__button-wrap {
+  .login-page--button-wrap {
     text-align: center;
     margin-top: 25px;
 
@@ -252,7 +287,7 @@ export default {
     }
   }
 
-  .login-page__wrapper-clue {
+  .login-page--wrapper-clue {
     padding: 20px 25px 15px 25px;
     margin: 100px auto 150px;
 
@@ -266,18 +301,18 @@ export default {
   }
 
   @media (max-width: 515px) {
-    .login-page__button-wrap button {
+    .login-page--button-wrap button {
       width: 100%;
     }
 
-    .login-page__wrapper {
+    .login-page--wrapper {
       margin-top: 50px;
       max-width: 90%;
     }
   }
 
   @media (max-width: 400px) {
-    .login-page__form {
+    .login-page--form {
       padding: 15px 15px 25px;
     }
   }
