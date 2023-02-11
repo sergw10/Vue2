@@ -22,7 +22,7 @@
           <input id="phoneNumber"
                  type="text"
                  :placeholder="loginPage.form.phoneNumberPlaceholder"
-                 v-model="loginPage.userPhoneNumberValue">
+                 v-model.trim="loginPage.userPhoneNumberValue">
           <span class="error-text">Error phone</span>
         </div>
         <div class="login-page--button-wrap">
