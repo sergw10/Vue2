@@ -26,10 +26,6 @@ export default new Vuex.Store({
       state.allTodoItems = todoItems
     },
 
-    setCurrentUser (state, currentUser) {
-      state.currentUser = currentUser
-    },
-
     setNewTodoItem (state, newTodoOptions) {
       state.allTodoItems.push(newTodoOptions)
     },
@@ -44,6 +40,16 @@ export default new Vuex.Store({
       state.allTodoItems[todoItemId - 1] = Object.assign({}, state.allTodoItems[todoItemId - 1], {
         favorites: false
       })
+    },
+
+    defineAndSetCurrentUser (state, loginParams) {
+      let currentUser = {}
+      state.allUsers.forEach(function (item) {
+        if (item.username === loginParams.username && item.phone === loginParams.userPhoneNumber) {
+          currentUser = item
+        }
+      })
+      state.currentUser = currentUser
     }
   },
 

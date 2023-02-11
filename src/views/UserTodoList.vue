@@ -206,19 +206,21 @@
           </div>
         </div>
       </div>
-
     </div>
+
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'UserTodoList',
 
   data () {
     return {
+      /* Search */
+      searchTitleInput: '',
       searchResultListView: [],
       searchResult: [],
       searchOptions: {
@@ -226,9 +228,6 @@ export default {
         status: 'all',
         userId: ''
       },
-
-      /* Search */
-      searchTitleInput: '',
 
       /* Select */
       statusFilterSelect: '',
@@ -238,7 +237,10 @@ export default {
       /* Popup */
       isAddNewItemPopupOpen: false,
       newTodoUserId: '',
-      newTodoTitle: ''
+      newTodoTitle: '',
+
+      /* Favorites */
+      favoritesForCurrentUser: []
     }
   },
 
@@ -251,6 +253,11 @@ export default {
   },
 
   methods: {
+    ...mapActions([
+      'getUsers',
+      'getAllTodoItems'
+    ]),
+
     onChangeSearchOptions (event, option) {
       if (option === 'title') {
         this._setSearchOptions(event.target.value, this.searchOptions.status, this.searchOptions.userId)
@@ -348,6 +355,18 @@ export default {
       }
     },
 
+    _addFavoriteToLocalStorage (todoItemId) {
+      this.favoritesForCurrentUser.push(+todoItemId)
+      // JSON.parse(
+      const favoritesList = []
+      favoritesList.push({
+        id: this.CURRENT_USER.id,
+        favoritesIdList: this.favoritesForCurrentUser
+      })
+      localStorage.setItem('favoritesList', JSON.stringify(favoritesList))
+      // localStorage.getItem('favoritesList')
+    },
+
     addNewTodoItemToState () {
       if (this.newTodoUserId === '') return
       if (this.newTodoTitle === '') return
@@ -367,13 +386,17 @@ export default {
     },
 
     addItemToFavorite (todoItemId) {
+      this._addFavoriteToLocalStorage(todoItemId)
+
       this.$store.commit('addFavoriteItemToState', +todoItemId)
+
       this.$forceUpdate()
       this._setTodoItemsInTableFromState()
     },
 
     removeItemFromFavorite (todoItemId) {
       this.$store.commit('removeFavoriteItemFromState', +todoItemId)
+
       this.$forceUpdate()
       this._setTodoItemsInTableFromState()
     },
@@ -486,6 +509,7 @@ export default {
     margin: 0 20px;
 
     select {
+      transition: border 0.4s ease;
       min-width: 120px;
       height: 30px;
       padding: 4px;
@@ -494,6 +518,11 @@ export default {
       font-size: 15px;
       color: black;
       cursor: pointer;
+
+      &:focus-visible {
+        outline: none;
+        border: 1px solid #313131;
+      }
     }
   }
 
@@ -754,6 +783,7 @@ export default {
   .new-todo--popup-title {
     text-align: center;
     margin-bottom: 20px;
+    font-weight: 600;
   }
 
   .new-todo--user-id-wrap {

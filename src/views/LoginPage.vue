@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapMutations, mapGetters } from 'vuex'
 
 export default {
   name: 'LoginPage',
@@ -61,8 +61,6 @@ export default {
   data () {
     return {
       loginPage: {
-        /* Data */
-        currentUser: {},
         usernameValue: '',
         userPhoneNumberValue: '',
         isValidUserName: true,
@@ -98,28 +96,26 @@ export default {
   computed: {
     ...mapGetters([
       'ALL_USERS',
-      'All_TODO_ITEMS'
+      'All_TODO_ITEMS',
+      'CURRENT_USER'
     ])
   },
 
   methods: {
+    ...mapMutations([
+      'defineAndSetCurrentUser'
+    ]),
+
     ...mapActions([
       'getUsers',
       'getAllTodoItems'
     ]),
 
     _defineCurrentUser () {
-      const usernameValue = this.loginPage.usernameValue
-      const userPhoneNumberValue = this.loginPage.userPhoneNumberValue
-      let currentUser = {}
-
-      this.ALL_USERS.forEach(function (item) {
-        if (item.username === usernameValue && item.phone === userPhoneNumberValue) {
-          currentUser = item
-        }
+      this.defineAndSetCurrentUser({
+        username: this.loginPage.usernameValue,
+        userPhoneNumber: this.loginPage.userPhoneNumberValue
       })
-
-      this.loginPage.currentUser = currentUser
     },
 
     _validateUserName () {
@@ -155,22 +151,21 @@ export default {
     logIn () {
       if (this._validateForm()) {
         this._defineCurrentUser()
-        this._setCurrentUserToState()
 
         this.$router.push({
           name: 'UserTodoListPage',
           params: {
-            id: this.loginPage.currentUser.id
+            id: this.CURRENT_USER.id
           }
         })
 
-        this.loginPage.usernameValue = ''
-        this.loginPage.userPhoneNumberValue = ''
+        this._clearFields()
       }
     },
 
-    _setCurrentUserToState () {
-      this.$store.commit('setCurrentUser', this.loginPage.currentUser)
+    _clearFields () {
+      this.loginPage.usernameValue = ''
+      this.loginPage.userPhoneNumberValue = ''
     }
   }
 }
