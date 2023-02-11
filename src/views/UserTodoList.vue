@@ -76,7 +76,12 @@
         <div class="todo-list--table-settings">
           <div class="filter-title--wrap">
             <label for="title-search--field">Search</label>
-            <input id="title-search--field" class="title-search--field" placeholder="Search title..." type="text">
+            <input id="title-search--field"
+                   class="title-search--field"
+                   placeholder="Search title..."
+                   @input="onChangeSearchOptions($event, 'title')"
+                   v-model="searchTitleInput"
+                   type="text">
           </div>
 
           <div class="selects-wrap">
@@ -84,7 +89,7 @@
               <label for="filter-status--select">Select Status</label>
               <select id="filter-status--select"
                       class="filter-status--select"
-                      @change="onChangeStatusSelect($event)"
+                      @change="onChangeSearchOptions($event, 'status')"
                       v-model="statusFilterSelect">
                 <option disabled selected value="">--- select status ---</option>
                 <option value="all">All</option>
@@ -98,7 +103,7 @@
               <label for="filter-userId--select">Select User ID</label>
               <select id="filter-userId--select"
                       class="filter-userId--select"
-                      @change="onChangeUserIdSelect($event)"
+                      @change="onChangeSearchOptions($event, 'userId')"
                       v-model="userIdFilterSelect">
                 <option selected value="">--- empty value ---</option>
                 <option v-for="option in userIdFilterSelectOptions"
@@ -133,8 +138,8 @@
           </div>
 
           <!-- Table Body -->
-          <div class="todo-list--table-body" v-if="searchResultList.length">
-            <div v-for="todoItem in searchResultList" :key="todoItem.id" class="todo-list--table-item">
+          <div class="todo-list--table-body" v-if="searchResultListView.length">
+            <div v-for="todoItem in searchResultListView" :key="todoItem.id" class="todo-list--table-item">
               <div class="todo-list--table-item-id">
                 <span>{{ todoItem.id }}</span>
               </div>
@@ -214,12 +219,16 @@ export default {
 
   data () {
     return {
-      searchResultList: [],
+      searchResultListView: [],
+      searchResult: [],
       searchOptions: {
         title: '',
         status: 'all',
         userId: ''
       },
+
+      /* Search */
+      searchTitleInput: '',
 
       /* Select */
       statusFilterSelect: '',
@@ -242,42 +251,72 @@ export default {
   },
 
   methods: {
-    onChangeStatusSelect (event) {
-      this._setSearchOptions(this.searchOptions.title, event.target.value, this.searchOptions.userId)
-      this._filterSearchResultItems()
+    onChangeSearchOptions (event, option) {
+      if (option === 'title') {
+        this._setSearchOptions(event.target.value, this.searchOptions.status, this.searchOptions.userId)
+      } else if (option === 'status') {
+        this._setSearchOptions(this.searchOptions.title, event.target.value, this.searchOptions.userId)
+      } else if (option === 'userId') {
+        this._setSearchOptions(this.searchOptions.title, this.searchOptions.status, event.target.value)
+      }
+
+      this._filterItemsByOptions()
     },
 
-    _filterSearchResultItems () {
-      const searchOptionUserId = this.searchOptions.userId
+    _filterItemsByOptions () {
+      this._filterListByStatus()
+      this._filterListByUserId()
+      this._filterListByTitle()
 
-      /* Status filtering */
+      this.searchResultListView = this.searchResult
+    },
+
+    _filterListByStatus () {
       if (this.searchOptions.status === 'all') {
-        this.searchResultList = this.All_TODO_ITEMS
+        this.searchResult = this.All_TODO_ITEMS
       } if (this.searchOptions.status === 'completed') {
-        this.searchResultList = this.All_TODO_ITEMS.filter((todoItem) => {
+        this.searchResult = this.All_TODO_ITEMS.filter((todoItem) => {
           return todoItem.completed === true
         })
       } else if (this.searchOptions.status === 'uncompleted') {
-        this.searchResultList = this.All_TODO_ITEMS.filter((todoItem) => {
+        this.searchResult = this.All_TODO_ITEMS.filter((todoItem) => {
           return todoItem.completed === false
         })
       } else if (this.searchOptions.status === 'favorites') {
-        this.searchResultList = this.All_TODO_ITEMS.filter((todoItem) => {
+        this.searchResult = this.All_TODO_ITEMS.filter((todoItem) => {
           return todoItem?.favorites === true
-        })
-      }
-
-      /* User Id filtering */
-      if (this.searchOptions.userId !== '') {
-        this.searchResultList = this.searchResultList.filter((todoItem) => {
-          return +todoItem.userId === +searchOptionUserId
         })
       }
     },
 
-    onChangeUserIdSelect (event) {
-      this._setSearchOptions(this.searchOptions.title, this.searchOptions.status, event.target.value)
-      this._filterSearchResultItems()
+    _filterListByUserId () {
+      const userId = this.searchOptions.userId
+      let currentSearchList
+
+      if (userId !== '') {
+        if (this.searchOptions.status === 'all' && this.searchOptions.title === '') {
+          currentSearchList = this.All_TODO_ITEMS
+        } else currentSearchList = this.searchResult
+
+        this.searchResult = currentSearchList.filter((todoItem) => {
+          return +todoItem.userId === +userId
+        })
+      }
+    },
+
+    _filterListByTitle () {
+      const title = this.searchOptions.title
+      let currentSearchList
+
+      if (title !== '') {
+        if (this.searchOptions.status === 'all' && this.searchOptions.userId === '') {
+          currentSearchList = this.All_TODO_ITEMS
+        } else currentSearchList = this.searchResult
+
+        this.searchResult = currentSearchList.filter((todoItem) => {
+          return todoItem.title.includes(title)
+        })
+      }
     },
 
     _setSearchOptions (title, status, userId) {
@@ -298,7 +337,7 @@ export default {
     },
 
     _setTodoItemsInTableFromState () {
-      this.searchResultList = this.All_TODO_ITEMS
+      this.searchResultListView = this.All_TODO_ITEMS
     },
 
     _addNewIdToUserIdSelect (NewId) {
