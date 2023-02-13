@@ -159,7 +159,6 @@
 
               <div class="todo-list--table-item-status text-green" v-if="todoItem.completed">Completed</div>
               <div class="todo-list--table-item-status text-red" v-else>Uncompleted</div>
-
               <!-- For mobile -->
               <div class="todo-list--table-item-status-mobile text-green" v-if="todoItem.completed"><div></div></div>
               <div class="todo-list--table-item-status-mobile text-red" v-else><div></div></div>
@@ -201,7 +200,7 @@
           </div>
 
           <div class="new-todo--btn-wrap">
-            <button @click="addNewTodoItemToState()" class="new-todo--add-btn btn-green" type="button">Add</button>
+            <button @click="addNewTodoItemToStore()" class="new-todo--add-btn btn-green" type="button">Add</button>
             <button @click="closeModal()" class="new-todo--cancel-btn btn-red" type="button">Cancel</button>
           </div>
         </div>
@@ -237,10 +236,7 @@ export default {
       /* Popup */
       isAddNewItemPopupOpen: false,
       newTodoUserId: '',
-      newTodoTitle: '',
-
-      /* Favorites */
-      favoritesForCurrentUser: []
+      newTodoTitle: ''
     }
   },
 
@@ -281,17 +277,15 @@ export default {
     _filterListByStatus () {
       if (this.searchOptions.status === 'all') {
         this.searchResult = this.All_TODO_ITEMS
-      } if (this.searchOptions.status === 'completed') {
+      } else {
         this.searchResult = this.All_TODO_ITEMS.filter((todoItem) => {
-          return todoItem.completed === true
-        })
-      } else if (this.searchOptions.status === 'uncompleted') {
-        this.searchResult = this.All_TODO_ITEMS.filter((todoItem) => {
-          return todoItem.completed === false
-        })
-      } else if (this.searchOptions.status === 'favorites') {
-        this.searchResult = this.All_TODO_ITEMS.filter((todoItem) => {
-          return todoItem?.favorites === true
+          if (this.searchOptions.status === 'completed') {
+            return todoItem.completed === true
+          } else if (this.searchOptions.status === 'uncompleted') {
+            return todoItem.completed === false
+          } else if (this.searchOptions.status === 'favorites') {
+            return todoItem?.favorites === true
+          }
         })
       }
     },
@@ -343,7 +337,7 @@ export default {
       }
     },
 
-    _setTodoItemsInTableFromState () {
+    _setTodoItemsInTableFromStore () {
       this.searchResultListView = this.All_TODO_ITEMS
     },
 
@@ -355,19 +349,85 @@ export default {
       }
     },
 
-    _addFavoriteToLocalStorage (todoItemId) {
-      this.favoritesForCurrentUser.push(+todoItemId)
-      // JSON.parse(
-      const favoritesList = []
-      favoritesList.push({
-        id: this.CURRENT_USER.id,
-        favoritesIdList: this.favoritesForCurrentUser
-      })
+    _addFavoriteItemToLocalStorage (favoriteNewItemId) {
+      const currentUserId = this.CURRENT_USER.id
+      const favoritesList = this._returnFavoritesListFromLocalStorage()
+
+      if (favoritesList.length === 0) {
+        favoritesList.push({ id: currentUserId, favoritesIdsList: [favoriteNewItemId] })
+      } else {
+        favoritesList.find((item) => {
+          if (item.id === currentUserId) item.favoritesIdsList.push(favoriteNewItemId)
+        })
+      }
+
       localStorage.setItem('favoritesList', JSON.stringify(favoritesList))
-      // localStorage.getItem('favoritesList')
     },
 
-    addNewTodoItemToState () {
+    _deleteFavoriteItemFromLocalStorage (favoriteItemId) {
+      const currentUserId = this.CURRENT_USER.id
+      const favoritesList = JSON.parse(localStorage.getItem('favoritesList'))
+      let newFavoritesIdsArr
+
+      favoritesList.find((item) => {
+        if (item.id === currentUserId) {
+          item.favoritesIdsList.find((favoritesIdsArrItem, favoritesIdsIndex, array) => {
+            if (favoritesIdsArrItem === favoriteItemId) {
+              if (array.length !== 1) {
+                array.splice(favoritesIdsIndex, 1)
+                newFavoritesIdsArr = array
+              } else newFavoritesIdsArr = []
+            }
+          })
+
+          item.favoritesIdsList = newFavoritesIdsArr
+        }
+      })
+
+      localStorage.setItem('favoritesList', JSON.stringify(favoritesList))
+    },
+
+    _returnFavoritesListFromLocalStorage () {
+      return JSON.parse(
+        localStorage.getItem('favoritesList') === null ? '[]' : localStorage.getItem('favoritesList')
+      )
+    },
+
+    _isUserNewInLocalStorageFavoriteList () {
+      const currentUserId = this.CURRENT_USER.id
+      const favoritesList = this._returnFavoritesListFromLocalStorage()
+      const currentUser = favoritesList.find(item => item.id === currentUserId)
+
+      return currentUser === undefined
+    },
+
+    _updateFavoriteStatusesView () {
+      const currentUserId = this.CURRENT_USER.id
+      const favoritesList = this._returnFavoritesListFromLocalStorage()
+
+      if (this._isUserNewInLocalStorageFavoriteList()) {
+        this._addNewUserToLocalStorageFavoritesList()
+      } else {
+        const currentUser = favoritesList.find(item => item.id === currentUserId)
+        this.$store.commit('updateFavoriteStatusesInState', currentUser.favoritesIdsList)
+      }
+
+      this.$forceUpdate()
+      this._setTodoItemsInTableFromStore()
+    },
+
+    _addNewUserToLocalStorageFavoritesList () {
+      const currentUserId = this.CURRENT_USER.id
+      const favoritesList = this._returnFavoritesListFromLocalStorage()
+
+      if (this._isUserNewInLocalStorageFavoriteList()) {
+        favoritesList.push({ id: currentUserId, favoritesIdsList: [] })
+      }
+
+      localStorage.setItem('favoritesList', JSON.stringify(favoritesList))
+    },
+
+    addNewTodoItemToStore () {
       if (this.newTodoUserId === '') return
       if (this.newTodoTitle === '') return
 
@@ -386,19 +446,15 @@ export default {
     },
 
     addItemToFavorite (todoItemId) {
-      this._addFavoriteToLocalStorage(todoItemId)
-
       this.$store.commit('addFavoriteItemToState', +todoItemId)
-
-      this.$forceUpdate()
-      this._setTodoItemsInTableFromState()
+      this._addFavoriteItemToLocalStorage(+todoItemId)
+      this._updateFavoriteStatusesView()
     },
 
     removeItemFromFavorite (todoItemId) {
       this.$store.commit('removeFavoriteItemFromState', +todoItemId)
-
-      this.$forceUpdate()
-      this._setTodoItemsInTableFromState()
+      this._deleteFavoriteItemFromLocalStorage(+todoItemId)
+      this._updateFavoriteStatusesView()
     },
 
     isNumber (event) {
@@ -422,7 +478,7 @@ export default {
   },
 
   mounted () {
-    this._setTodoItemsInTableFromState()
+    this._updateFavoriteStatusesView()
     this._setIdsToSelect()
   }
 }

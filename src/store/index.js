@@ -36,6 +36,16 @@ export default new Vuex.Store({
       })
     },
 
+    updateFavoriteStatusesInState (state, favoritesItemIdList) {
+      for (let i = 0; i < favoritesItemIdList.length; i++) {
+        state.allTodoItems.forEach(item => {
+          if (item.id === favoritesItemIdList[i]) {
+            item.favorites = true
+          }
+        })
+      }
+    },
+
     removeFavoriteItemFromState (state, todoItemId) {
       state.allTodoItems[todoItemId - 1] = Object.assign({}, state.allTodoItems[todoItemId - 1], {
         favorites: false
@@ -44,7 +54,7 @@ export default new Vuex.Store({
 
     defineAndSetCurrentUser (state, loginParams) {
       let currentUser = {}
-      state.allUsers.forEach(function (item) {
+      state.allUsers.forEach(item => {
         if (item.username === loginParams.username && item.phone === loginParams.userPhoneNumber) {
           currentUser = item
         }
